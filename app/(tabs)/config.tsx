@@ -76,6 +76,12 @@ export default function ConfigScreen() {
       </Pressable>
       <View>
         <ThemedText>Versao: {Constants.expoConfig?.version ?? '1.0.0'}</ThemedText>
+        <ThemedText style={styles.creditText}>
+          Desenvolvido por{' '}
+          <ThemedText style={styles.creditLink} onPress={() => Linking.openURL('https://marciliortiz.dev.br')}>
+            Marcilio Ortiz
+          </ThemedText>
+        </ThemedText>
       </View>
     </ThemedView>
   );
@@ -104,5 +110,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 13,
+  },
+  creditText: {
+    marginTop: 8,
+  },
+  creditLink: {
+    color: '#0a7ea4',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
