@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -40,6 +40,20 @@ export default function ConfigScreen() {
     router.replace('/setup');
   };
 
+  const onOpenSite = async () => {
+    if (!baseUrl.trim()) {
+      Alert.alert('URL nao configurada', 'Informe e salve a URL do site primeiro.');
+      return;
+    }
+    const url = baseUrl.trim().replace(/\/+$/, '');
+    const canOpen = await Linking.canOpenURL(url);
+    if (!canOpen) {
+      Alert.alert('Nao foi possivel abrir', 'Verifique a URL do site nas configuracoes.');
+      return;
+    }
+    await Linking.openURL(url);
+  };
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Configuracoes</ThemedText>
@@ -56,6 +70,9 @@ export default function ConfigScreen() {
       </Pressable>
       <Pressable style={styles.secondaryButton} onPress={onReset}>
         <ThemedText>Trocar credenciais</ThemedText>
+      </Pressable>
+      <Pressable style={styles.secondaryButton} onPress={onOpenSite}>
+        <ThemedText>Abrir site no navegador</ThemedText>
       </Pressable>
       <View>
         <ThemedText>Versao: {Constants.expoConfig?.version ?? '1.0.0'}</ThemedText>

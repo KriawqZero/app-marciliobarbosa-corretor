@@ -15,9 +15,9 @@ const schema = z.object({
   purpose: z.enum(['venda', 'aluguel']),
   type: z.enum(['casa', 'apartamento', 'terreno', 'rural', 'comercial']),
   city: z.enum(['corumba', 'ladario']),
-  neighborhood: z.string().min(1),
-  price: z.coerce.number().positive(),
-  totalArea: z.coerce.number().positive(),
+  neighborhood: z.string().min(1, 'Informe o bairro.'),
+  price: z.coerce.number().positive('Informe um preco valido.'),
+  totalArea: z.coerce.number().positive('Informe a area total.'),
   bedrooms: z.coerce.number().nullable().optional(),
   bathrooms: z.coerce.number().nullable().optional(),
   parkingSpaces: z.coerce.number().nullable().optional(),
@@ -72,6 +72,7 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
     handleSubmit,
     getValues,
     setValue,
+    trigger,
     formState: { isSubmitting, errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -136,6 +137,66 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
     }
   };
 
+  const getStepMissingRequiredFields = (currentStep: number): string[] => {
+    const values = getValues();
+    if (currentStep === 0) {
+      return images.length === 0 ? ['Fotos'] : [];
+    }
+    if (currentStep === 1) {
+      const missing: string[] = [];
+      if (!values.title?.trim() || values.title.trim().length < 3) missing.push('Titulo');
+      if (!values.neighborhood?.trim()) missing.push('Bairro');
+      return missing;
+    }
+    if (currentStep === 2) {
+      const missing: string[] = [];
+      if (!Number.isFinite(Number(values.price)) || Number(values.price) <= 0) missing.push('Preco');
+      if (!Number.isFinite(Number(values.totalArea)) || Number(values.totalArea) <= 0) {
+        missing.push('Area total');
+      }
+      return missing;
+    }
+    if (currentStep === 3) {
+      return values.status ? [] : ['Status'];
+    }
+    return [];
+  };
+
+  const onNext = async () => {
+    if (step === 0) {
+      if (images.length === 0) {
+        Alert.alert('Campo obrigatorio', 'Adicione pelo menos uma foto para continuar.');
+        return;
+      }
+      setStep((s) => Math.min(4, s + 1));
+      return;
+    }
+
+    const fieldsByStep: Record<number, (keyof FormValues)[]> = {
+      1: ['title', 'neighborhood'],
+      2: ['price', 'totalArea'],
+      3: ['status'],
+    };
+
+    const currentFields = fieldsByStep[step] ?? [];
+    const valid = await trigger(currentFields);
+    const missing = getStepMissingRequiredFields(step);
+
+    if (!valid || missing.length > 0) {
+      const message =
+        missing.length > 0
+          ? `Preencha os campos obrigatorios desta etapa:\n- ${missing.join('\n- ')}`
+          : 'Preencha os campos obrigatorios desta etapa.';
+      Alert.alert(
+        'Campos obrigatorios pendentes',
+        message
+      );
+      return;
+    }
+
+    setStep((s) => Math.min(4, s + 1));
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <ThemedText type="subtitle">
@@ -153,6 +214,7 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
               <TextInput style={styles.input} placeholder="Titulo do imovel" value={field.value} onChangeText={field.onChange} />
             )}
           />
+          {errors.title?.message ? <ThemedText style={styles.errorText}>{errors.title.message}</ThemedText> : null}
           <OptionsField control={control} name="purpose" options={PURPOSE_OPTIONS} />
           <OptionsField control={control} name="type" options={TYPE_OPTIONS} />
           <OptionsField control={control} name="city" options={CITY_OPTIONS} />
@@ -163,6 +225,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
               <TextInput style={styles.input} placeholder="Bairro" value={field.value} onChangeText={field.onChange} />
             )}
           />
+          {errors.neighborhood?.message ? (
+            <ThemedText style={styles.errorText}>{errors.neighborhood.message}</ThemedText>
+          ) : null}
         </View>
       ) : null}
 
@@ -181,6 +246,7 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
               />
             )}
           />
+          {errors.price?.message ? <ThemedText style={styles.errorText}>{errors.price.message}</ThemedText> : null}
           <Controller
             control={control}
             name="totalArea"
@@ -194,6 +260,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
               />
             )}
           />
+          {errors.totalArea?.message ? (
+            <ThemedText style={styles.errorText}>{errors.totalArea.message}</ThemedText>
+          ) : null}
           <Controller
             control={control}
             name="bedrooms"
@@ -301,7 +370,12 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
               />
             )}
           />
-          <OptionsField control={control} name="status" options={STATUS_OPTIONS} />
+          <OptionsField
+            control={control}
+            name="status"
+            options={STATUS_OPTIONS}
+            errorMessage={errors.status?.message}
+          />
         </View>
       ) : null}
 
@@ -318,7 +392,7 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
           <ThemedText>Voltar</ThemedText>
         </Pressable>
         {step < 4 ? (
-          <Pressable style={styles.button} onPress={() => setStep((s) => Math.min(4, s + 1))}>
+          <Pressable style={styles.button} onPress={onNext}>
             <ThemedText>Proximo</ThemedText>
           </Pressable>
         ) : (
@@ -335,32 +409,37 @@ function OptionsField({
   control,
   name,
   options,
+  errorMessage,
 }: {
   control: any;
   name: string;
   options: { label: string; value: string }[];
+  errorMessage?: string;
 }) {
   return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <View style={styles.optionRow}>
-          {options.map((item) => {
-            const selected = field.value === item.value;
-            return (
-              <Pressable
-                key={item.value}
-                style={[styles.optionChip, selected && styles.optionChipSelected]}
-                onPress={() => field.onChange(item.value)}
-              >
-                <ThemedText style={selected ? styles.optionTextSelected : undefined}>{item.label}</ThemedText>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
-    />
+    <View style={styles.section}>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <View style={styles.optionRow}>
+            {options.map((item) => {
+              const selected = field.value === item.value;
+              return (
+                <Pressable
+                  key={item.value}
+                  style={[styles.optionChip, selected && styles.optionChipSelected]}
+                  onPress={() => field.onChange(item.value)}
+                >
+                  <ThemedText style={selected ? styles.optionTextSelected : undefined}>{item.label}</ThemedText>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+      />
+      {errorMessage ? <ThemedText style={styles.errorText}>{errorMessage}</ThemedText> : null}
+    </View>
   );
 }
 
@@ -416,5 +495,10 @@ const styles = StyleSheet.create({
   aiButtonText: {
     color: '#fff',
     fontWeight: '700',
+  },
+  errorText: {
+    color: '#b00020',
+    fontSize: 13,
+    marginTop: -6,
   },
 });

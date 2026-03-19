@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { formatCurrencyBRL } from '@/lib/format';
@@ -37,6 +37,19 @@ export default function PublishSuccessScreen() {
     await Share.share({ message: finalMessage });
   };
 
+  const onOpenSite = async () => {
+    if (!data) return;
+    const credentials = await getCredentials();
+    const baseUrl = credentials?.baseUrl ?? '';
+    const propertyUrl = `${baseUrl}/imovel/${data.slug}`;
+    const canOpen = await Linking.canOpenURL(propertyUrl);
+    if (!canOpen) {
+      Alert.alert('Nao foi possivel abrir', 'Verifique a URL configurada do site.');
+      return;
+    }
+    await Linking.openURL(propertyUrl);
+  };
+
   if (isLoading || !data) {
     return (
       <View style={styles.loadingContainer}>
@@ -59,6 +72,9 @@ export default function PublishSuccessScreen() {
 
       <Pressable style={styles.primaryButton} onPress={onShare}>
         <ThemedText style={styles.primaryButtonText}>Compartilhar nas redes</ThemedText>
+      </Pressable>
+      <Pressable style={styles.secondaryButton} onPress={onOpenSite}>
+        <ThemedText>Abrir anuncio no navegador</ThemedText>
       </Pressable>
       <Pressable style={styles.secondaryButton} onPress={() => router.replace('/(tabs)/imoveis')}>
         <ThemedText>Voltar para lista</ThemedText>
