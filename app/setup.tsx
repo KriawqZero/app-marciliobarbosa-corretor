@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { testConnection } from '@/lib/api';
 import { saveCredentials } from '@/lib/storage';
 
@@ -11,6 +12,11 @@ export default function SetupScreen() {
   const [baseUrl, setBaseUrl] = useState('');
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
+  const textColor = useThemeColor({}, 'text');
+  const primaryButton = useThemeColor({}, 'buttonPrimary');
+  const tintColor = useThemeColor({}, 'tint');
 
   const onSubmit = async () => {
     if (!baseUrl.trim() || !token.trim()) {
@@ -40,16 +46,24 @@ export default function SetupScreen() {
 
       <View style={styles.form}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor },
+          ]}
           placeholder="https://seu-site.com.br"
+          placeholderTextColor="#8B949E"
           autoCapitalize="none"
           autoCorrect={false}
           value={baseUrl}
           onChangeText={setBaseUrl}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor },
+          ]}
           placeholder="Bearer token"
+          placeholderTextColor="#8B949E"
           autoCapitalize="none"
           autoCorrect={false}
           secureTextEntry
@@ -58,9 +72,20 @@ export default function SetupScreen() {
         />
       </View>
 
-      <Pressable style={[styles.button, loading && styles.buttonDisabled]} onPress={onSubmit} disabled={loading}>
+      <Pressable
+        style={[styles.button, { backgroundColor: primaryButton }, loading && styles.buttonDisabled]}
+        onPress={onSubmit}
+        disabled={loading}
+      >
         {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.buttonText}>Conectar</ThemedText>}
       </Pressable>
+
+      <ThemedText style={styles.creditText}>
+        Desenvolvido por{' '}
+        <ThemedText style={[styles.creditLink, { color: tintColor }]} onPress={() => Linking.openURL('https://marciliortiz.dev.br')}>
+          Marcilio Ortiz
+        </ThemedText>
+      </ThemedText>
     </ThemedView>
   );
 }
@@ -80,14 +105,11 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: '#0a7ea4',
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
@@ -98,5 +120,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '700',
+  },
+  creditText: {
+    marginTop: 4,
+  },
+  creditLink: {
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

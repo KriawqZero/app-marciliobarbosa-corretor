@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View }
 
 import { PropertyCard } from '@/components/property/property-card';
 import { ThemedText } from '@/components/themed-text';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { STATUS_OPTIONS } from '@/lib/constants';
 import { useProperties } from '@/lib/queries';
 import { PropertyStatus } from '@/lib/types';
@@ -11,6 +12,11 @@ import { PropertyStatus } from '@/lib/types';
 export default function PropertiesListScreen() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<PropertyStatus | ''>('');
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
+  const mutedBorder = useThemeColor({}, 'mutedBorder');
+  const textColor = useThemeColor({}, 'text');
+  const primaryButton = useThemeColor({}, 'buttonPrimary');
 
   const params = useMemo(() => {
     const p = new URLSearchParams({ page: '1', limit: '20' });
@@ -33,15 +39,22 @@ export default function PropertiesListScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <ThemedText type="title">Imoveis</ThemedText>
 
-      <TextInput value={search} onChangeText={setSearch} placeholder="Buscar imovel..." style={styles.input} />
+      <TextInput
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Buscar imovel..."
+        placeholderTextColor="#8B949E"
+        style={[styles.input, { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor }]}
+      />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statusRow}>
-        <FilterChip label="Todos" selected={!status} onPress={() => setStatus('')} />
+          <FilterChip label="Todos" selected={!status} onPress={() => setStatus('')} borderColor={mutedBorder} />
         {STATUS_OPTIONS.map((option) => (
           <FilterChip
             key={option.value}
             label={option.label}
             selected={status === option.value}
             onPress={() => setStatus(option.value)}
+              borderColor={mutedBorder}
           />
         ))}
       </ScrollView>
@@ -50,7 +63,7 @@ export default function PropertiesListScreen() {
         <Pressable style={styles.reload} onPress={() => refetch()}>
           <ThemedText>Atualizar</ThemedText>
         </Pressable>
-        <Pressable style={styles.createButton} onPress={() => router.push('/(tabs)/imoveis/criar')}>
+        <Pressable style={[styles.createButton, { backgroundColor: primaryButton }]} onPress={() => router.push('/(tabs)/imoveis/criar')}>
           <ThemedText style={styles.createButtonText}>Novo</ThemedText>
         </Pressable>
       </View>
@@ -66,13 +79,15 @@ function FilterChip({
   label,
   selected,
   onPress,
+  borderColor,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  borderColor: string;
 }) {
   return (
-    <Pressable style={[styles.chip, selected && styles.chipSelected]} onPress={onPress}>
+    <Pressable style={[styles.chip, { borderColor }, selected && styles.chipSelected]} onPress={onPress}>
       <ThemedText style={selected ? styles.chipTextSelected : undefined}>{label}</ThemedText>
     </Pressable>
   );
@@ -83,11 +98,9 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   input: {
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
   },
   statusRow: { gap: 8, paddingVertical: 4 },
   chip: {
@@ -95,7 +108,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#bdbdbd',
   },
   chipSelected: { backgroundColor: '#0a7ea4', borderColor: '#0a7ea4' },
   chipTextSelected: { color: '#fff' },

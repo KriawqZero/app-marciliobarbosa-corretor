@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { PhotoPicker } from '@/components/property/photo-picker';
 import { ThemedText } from '@/components/themed-text';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { CITY_OPTIONS, PURPOSE_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS } from '@/lib/constants';
 import { useGenerateWithAI } from '@/lib/queries';
 import { CreatePropertyPayload, Property, PropertyImage } from '@/lib/types';
@@ -42,6 +43,13 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
   const [step, setStep] = useState(0);
   const [images, setImages] = useState<PropertyImage[]>(initial?.gallery ?? []);
   const [rawNotes, setRawNotes] = useState('');
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
+  const mutedBorder = useThemeColor({}, 'mutedBorder');
+  const textColor = useThemeColor({}, 'text');
+  const primaryButton = useThemeColor({}, 'buttonPrimary');
+  const dangerColor = useThemeColor({}, 'danger');
+  const themedInputStyle = { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor };
   const aiMutation = useGenerateWithAI();
 
   const defaultValues = useMemo<FormValues>(
@@ -211,22 +219,34 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             control={control}
             name="title"
             render={({ field }) => (
-              <TextInput style={styles.input} placeholder="Titulo do imovel" value={field.value} onChangeText={field.onChange} />
+              <TextInput
+                style={[styles.input, themedInputStyle]}
+                placeholder="Titulo do imovel"
+                placeholderTextColor="#8B949E"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
             )}
           />
-          {errors.title?.message ? <ThemedText style={styles.errorText}>{errors.title.message}</ThemedText> : null}
-          <OptionsField control={control} name="purpose" options={PURPOSE_OPTIONS} />
-          <OptionsField control={control} name="type" options={TYPE_OPTIONS} />
-          <OptionsField control={control} name="city" options={CITY_OPTIONS} />
+          {errors.title?.message ? <ThemedText style={[styles.errorText, { color: dangerColor }]}>{errors.title.message}</ThemedText> : null}
+          <OptionsField control={control} name="purpose" options={PURPOSE_OPTIONS} mutedBorder={mutedBorder} dangerColor={dangerColor} />
+          <OptionsField control={control} name="type" options={TYPE_OPTIONS} mutedBorder={mutedBorder} dangerColor={dangerColor} />
+          <OptionsField control={control} name="city" options={CITY_OPTIONS} mutedBorder={mutedBorder} dangerColor={dangerColor} />
           <Controller
             control={control}
             name="neighborhood"
             render={({ field }) => (
-              <TextInput style={styles.input} placeholder="Bairro" value={field.value} onChangeText={field.onChange} />
+              <TextInput
+                style={[styles.input, themedInputStyle]}
+                placeholder="Bairro"
+                placeholderTextColor="#8B949E"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
             )}
           />
           {errors.neighborhood?.message ? (
-            <ThemedText style={styles.errorText}>{errors.neighborhood.message}</ThemedText>
+            <ThemedText style={[styles.errorText, { color: dangerColor }]}>{errors.neighborhood.message}</ThemedText>
           ) : null}
         </View>
       ) : null}
@@ -238,22 +258,24 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="price"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Preco"
+                placeholderTextColor="#8B949E"
                 keyboardType="numeric"
                 value={String(field.value ?? '')}
                 onChangeText={field.onChange}
               />
             )}
           />
-          {errors.price?.message ? <ThemedText style={styles.errorText}>{errors.price.message}</ThemedText> : null}
+          {errors.price?.message ? <ThemedText style={[styles.errorText, { color: dangerColor }]}>{errors.price.message}</ThemedText> : null}
           <Controller
             control={control}
             name="totalArea"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Area total m2"
+                placeholderTextColor="#8B949E"
                 keyboardType="numeric"
                 value={String(field.value ?? '')}
                 onChangeText={field.onChange}
@@ -261,15 +283,16 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             )}
           />
           {errors.totalArea?.message ? (
-            <ThemedText style={styles.errorText}>{errors.totalArea.message}</ThemedText>
+            <ThemedText style={[styles.errorText, { color: dangerColor }]}>{errors.totalArea.message}</ThemedText>
           ) : null}
           <Controller
             control={control}
             name="bedrooms"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Quartos"
+                placeholderTextColor="#8B949E"
                 keyboardType="numeric"
                 value={field.value === null ? '' : String(field.value)}
                 onChangeText={(v) => field.onChange(v ? Number(v) : null)}
@@ -281,8 +304,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="bathrooms"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Banheiros"
+                placeholderTextColor="#8B949E"
                 keyboardType="numeric"
                 value={field.value === null ? '' : String(field.value)}
                 onChangeText={(v) => field.onChange(v ? Number(v) : null)}
@@ -294,8 +318,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="parkingSpaces"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Vagas"
+                placeholderTextColor="#8B949E"
                 keyboardType="numeric"
                 value={field.value === null ? '' : String(field.value)}
                 onChangeText={(v) => field.onChange(v ? Number(v) : null)}
@@ -308,13 +333,14 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
       {step === 3 ? (
         <View style={styles.section}>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, themedInputStyle, styles.textArea]}
             multiline
             placeholder="Notas brutas para IA (ex: 3 quartos, piscina, area gourmet, aceita financiamento...)"
+            placeholderTextColor="#8B949E"
             value={rawNotes}
             onChangeText={setRawNotes}
           />
-          <Pressable style={styles.aiButton} onPress={generateWithAI} disabled={aiMutation.isPending}>
+          <Pressable style={[styles.aiButton, { backgroundColor: primaryButton }]} onPress={generateWithAI} disabled={aiMutation.isPending}>
             {aiMutation.isPending ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -326,8 +352,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="shortDescription"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Descricao curta"
+                placeholderTextColor="#8B949E"
                 value={field.value}
                 onChangeText={field.onChange}
               />
@@ -338,9 +365,10 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="longDescription"
             render={({ field }) => (
               <TextInput
-                style={[styles.input, styles.textArea]}
+                style={[styles.input, themedInputStyle, styles.textArea]}
                 multiline
                 placeholder="Descricao longa"
+                placeholderTextColor="#8B949E"
                 value={field.value}
                 onChangeText={field.onChange}
               />
@@ -351,8 +379,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="priceNote"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Observacao de preco (ex: aceita financiamento)"
+                placeholderTextColor="#8B949E"
                 value={field.value}
                 onChangeText={field.onChange}
               />
@@ -363,8 +392,9 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="tagsInput"
             render={({ field }) => (
               <TextInput
-                style={styles.input}
+                style={[styles.input, themedInputStyle]}
                 placeholder="Tags separadas por virgula"
+                placeholderTextColor="#8B949E"
                 value={field.value}
                 onChangeText={field.onChange}
               />
@@ -375,6 +405,8 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
             name="status"
             options={STATUS_OPTIONS}
             errorMessage={errors.status?.message}
+            mutedBorder={mutedBorder}
+            dangerColor={dangerColor}
           />
         </View>
       ) : null}
@@ -388,15 +420,19 @@ export function PropertyWizardForm({ initial, mode, onSubmit }: Props) {
       ) : null}
 
       <View style={styles.footer}>
-        <Pressable style={[styles.button, step === 0 && styles.buttonDisabled]} onPress={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
+        <Pressable
+          style={[styles.button, { borderColor: mutedBorder }, step === 0 && styles.buttonDisabled]}
+          onPress={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={step === 0}
+        >
           <ThemedText>Voltar</ThemedText>
         </Pressable>
         {step < 4 ? (
-          <Pressable style={styles.button} onPress={onNext}>
+          <Pressable style={[styles.button, { borderColor: mutedBorder }]} onPress={onNext}>
             <ThemedText>Proximo</ThemedText>
           </Pressable>
         ) : (
-          <Pressable style={styles.publishButton} onPress={handleSubmit(submit)} disabled={isSubmitting}>
+          <Pressable style={[styles.publishButton, { backgroundColor: primaryButton }]} onPress={handleSubmit(submit)} disabled={isSubmitting}>
             <ThemedText style={styles.publishButtonText}>{isSubmitting ? 'Salvando...' : 'Publicar imovel'}</ThemedText>
           </Pressable>
         )}
@@ -410,11 +446,15 @@ function OptionsField({
   name,
   options,
   errorMessage,
+  mutedBorder,
+  dangerColor,
 }: {
   control: any;
   name: string;
   options: { label: string; value: string }[];
   errorMessage?: string;
+  mutedBorder: string;
+  dangerColor: string;
 }) {
   return (
     <View style={styles.section}>
@@ -428,7 +468,7 @@ function OptionsField({
               return (
                 <Pressable
                   key={item.value}
-                  style={[styles.optionChip, selected && styles.optionChipSelected]}
+                  style={[styles.optionChip, { borderColor: mutedBorder }, selected && styles.optionChipSelected]}
                   onPress={() => field.onChange(item.value)}
                 >
                   <ThemedText style={selected ? styles.optionTextSelected : undefined}>{item.label}</ThemedText>
@@ -438,7 +478,7 @@ function OptionsField({
           </View>
         )}
       />
-      {errorMessage ? <ThemedText style={styles.errorText}>{errorMessage}</ThemedText> : null}
+      {errorMessage ? <ThemedText style={[styles.errorText, { color: dangerColor }]}>{errorMessage}</ThemedText> : null}
     </View>
   );
 }
@@ -448,18 +488,15 @@ const styles = StyleSheet.create({
   section: { gap: 10 },
   input: {
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
   },
   textArea: { minHeight: 100, textAlignVertical: 'top' },
   optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   optionChip: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#bdbdbd',
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
@@ -474,20 +511,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     paddingVertical: 12,
   },
   buttonDisabled: { opacity: 0.6 },
   publishButton: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#0a7ea4',
     borderRadius: 10,
     paddingVertical: 12,
   },
   publishButtonText: { color: '#fff', fontWeight: '700' },
   aiButton: {
-    backgroundColor: '#2463eb',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
@@ -497,7 +531,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   errorText: {
-    color: '#b00020',
     fontSize: 13,
     marginTop: -6,
   },

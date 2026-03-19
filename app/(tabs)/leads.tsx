@@ -4,11 +4,15 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View }
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { useLeads } from '@/lib/queries';
 import { formatDateTime } from '@/lib/format';
 
 export default function LeadsScreen() {
   const [search, setSearch] = useState('');
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
+  const textColor = useThemeColor({}, 'text');
   const params = new URLSearchParams({ page: '1', limit: '20', search });
   const { data, isLoading, refetch } = useLeads(params);
 
@@ -23,7 +27,13 @@ export default function LeadsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <ThemedText type="title">Leads</ThemedText>
-      <TextInput value={search} onChangeText={setSearch} placeholder="Buscar por nome, email, mensagem..." style={styles.input} />
+      <TextInput
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Buscar por nome, email, mensagem..."
+        placeholderTextColor="#8B949E"
+        style={[styles.input, { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor }]}
+      />
       <Pressable style={styles.reload} onPress={() => refetch()}>
         <ThemedText>Atualizar</ThemedText>
       </Pressable>
@@ -57,11 +67,9 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   input: {
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
   },
   reload: { alignItems: 'flex-start' },
   card: {

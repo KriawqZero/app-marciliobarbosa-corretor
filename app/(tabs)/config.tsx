@@ -5,6 +5,7 @@ import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, TextInput, Vi
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { testConnection } from '@/lib/api';
 import { clearCredentials, getCredentials, saveCredentials } from '@/lib/storage';
 
@@ -12,6 +13,12 @@ export default function ConfigScreen() {
   const [baseUrl, setBaseUrl] = useState('');
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
+  const mutedBorder = useThemeColor({}, 'mutedBorder');
+  const textColor = useThemeColor({}, 'text');
+  const primaryButton = useThemeColor({}, 'buttonPrimary');
+  const tintColor = useThemeColor({}, 'tint');
 
   useEffect(() => {
     getCredentials().then((credentials) => {
@@ -57,28 +64,38 @@ export default function ConfigScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Configuracoes</ThemedText>
-      <TextInput style={styles.input} value={baseUrl} onChangeText={setBaseUrl} placeholder="URL do site" />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor }]}
+        value={baseUrl}
+        onChangeText={setBaseUrl}
+        placeholder="URL do site"
+        placeholderTextColor="#8B949E"
+      />
+      <TextInput
+        style={[styles.input, { backgroundColor: inputBackground, borderColor: inputBorder, color: textColor }]}
         value={token}
         onChangeText={setToken}
         placeholder="Token da API"
+        placeholderTextColor="#8B949E"
         secureTextEntry
       />
-      <Pressable style={styles.primaryButton} onPress={onSave} disabled={loading}>
+      <Pressable style={[styles.primaryButton, { backgroundColor: primaryButton }]} onPress={onSave} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.primaryButtonText}>Salvar e testar</ThemedText>}
       </Pressable>
-      <Pressable style={styles.secondaryButton} onPress={onReset}>
+      <Pressable style={[styles.secondaryButton, { borderColor: mutedBorder }]} onPress={onReset}>
         <ThemedText>Trocar credenciais</ThemedText>
       </Pressable>
-      <Pressable style={styles.secondaryButton} onPress={onOpenSite}>
+      <Pressable style={[styles.secondaryButton, { borderColor: mutedBorder }]} onPress={onOpenSite}>
         <ThemedText>Abrir site no navegador</ThemedText>
       </Pressable>
       <View>
         <ThemedText>Versao: {Constants.expoConfig?.version ?? '1.0.0'}</ThemedText>
         <ThemedText style={styles.creditText}>
           Desenvolvido por{' '}
-          <ThemedText style={styles.creditLink} onPress={() => Linking.openURL('https://marciliortiz.dev.br')}>
+          <ThemedText
+            style={[styles.creditLink, { color: tintColor }]}
+            onPress={() => Linking.openURL('https://marciliortiz.dev.br')}
+          >
             Marcilio Ortiz
           </ThemedText>
         </ThemedText>
@@ -91,14 +108,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 64, paddingHorizontal: 20, gap: 12 },
   input: {
     borderWidth: 1,
-    borderColor: '#c7c7c7',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
   },
   primaryButton: {
-    backgroundColor: '#0a7ea4',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 13,
@@ -106,7 +120,6 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: '#fff', fontWeight: '700' },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: '#bdbdbd',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 13,
@@ -115,7 +128,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   creditLink: {
-    color: '#0a7ea4',
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
