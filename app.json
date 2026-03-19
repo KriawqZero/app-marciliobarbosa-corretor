@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "VamoAgendar",
-    "slug": "VamoAgendar",
+    "name": "app-marciliobarbosa-corretor",
+    "slug": "app-marciliobarbosa-corretor",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "vamoagendar",
+    "scheme": "app-marciliobarbosa-corretor",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

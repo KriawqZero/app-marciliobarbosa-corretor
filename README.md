@@ -1,50 +1,100 @@
-# Welcome to your Expo app 👋
+# app-marciliobarbosa-corretor
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo base em Expo + React Native com duas abas:
 
-## Get started
+- `Home`: visão inicial com próximos agendamentos.
+- `Settings`: ajustes simples (notificações e lembrete).
 
-1. Install dependencies
+## Requisitos
 
-   ```bash
-   npm install
-   ```
+- Node.js 20+ (recomendado LTS)
+- npm
+- Android Studio (opcional, para emulador)
+- Celular Android com app `Expo Go` instalado
 
-2. Start the app
+## Como rodar o projeto
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Instale as dependências:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Inicie o servidor de desenvolvimento:
 
-## Learn more
+```bash
+npm run start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+ou:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+## Rodar no Android (recomendado para dev)
 
-Join our community of developers creating universal apps.
+### Opção 1 - Rede local (LAN) - mais simples
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Melhor para começar, se computador e celular estão na mesma rede Wi-Fi.
+
+1. Com `expo start` rodando, abra o app `Expo Go` no Android.
+2. Escaneie o QR code exibido no terminal.
+3. O app abre no celular e recarrega automaticamente após mudanças.
+
+Se não conectar:
+
+- confira se os dois dispositivos estão na mesma rede;
+- desative VPN/proxy temporariamente;
+- teste iniciar com:
+
+```bash
+npx expo start --tunnel
+```
+
+(`--tunnel` costuma funcionar quando a rede local bloqueia conexões).
+
+### Opção 2 - USB (mais estável em redes problemáticas)
+
+Boa quando o Wi-Fi está instável, mas exige ADB configurado.
+
+1. Ative `Opções do desenvolvedor` e `Depuração USB` no Android.
+2. Conecte o celular via USB.
+3. Verifique se o dispositivo foi reconhecido:
+
+```bash
+adb devices
+```
+
+4. Faça o redirecionamento de porta:
+
+```bash
+adb reverse tcp:8081 tcp:8081
+```
+
+5. Inicie o Expo:
+
+```bash
+npx expo start --localhost
+```
+
+6. Abra no `Expo Go` (normalmente funciona direto após o reverse).
+
+## Scripts úteis
+
+- `npm run start` - inicia o servidor Expo.
+- `npm run android` - tenta abrir no Android automaticamente.
+- `npm run web` - abre a versão web.
+- `npm run lint` - executa lint.
+
+## Estrutura principal
+
+- `app/(tabs)/index.tsx` - tela Home.
+- `app/(tabs)/explore.tsx` - tela Settings.
+- `app/(tabs)/_layout.tsx` - configuração das abas.
+
+## Próximos passos sugeridos
+
+- integrar backend para persistir agendamentos;
+- adicionar cadastro de clientes;
+- implementar criação/edição de horário.
