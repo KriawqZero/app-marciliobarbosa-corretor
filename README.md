@@ -4,9 +4,13 @@ Aplicativo móvel desenvolvido para auxiliar na gestão do dia a dia do corretor
 
 ## Contexto do Projeto
 
-Enquanto o portal imobiliário (Next.js) foca no cliente final e na captação, este aplicativo (Expo/React Native) atua como uma ferramenta interna de produtividade. Ele foi planejado para rodar no dispositivo pessoal do corretor, oferecendo um acesso rápido aos próximos compromissos, configurações de notificações e, futuramente, controle avançado da carteira de clientes.
+Este projeto é a interface mobile do ecossistema criado para o meu pai (corretor Marcílio Barbosa).
 
-A escolha de manter o app em um repositório separado (desacoplado do Next.js) garante que os ciclos de release mobile não interfiram no uptime do site principal, além de proporcionar uma arquitetura mais simples focada puramente no consumo de APIs.
+Como ele é leigo em tecnologia, a área administrativa padrão de sistemas web ou CMSs convencionais costuma ser uma grande barreira no dia a dia. Por isso, desenvolvi este app nativo para ser instalado diretamente no seu celular. O foco exclusivo é a facilidade de uso: com apenas alguns toques e uma interface extremamente enxuta, ele consegue visualizar sua agenda, notificações e cadastrar novos imóveis de onde estiver.
+
+O aplicativo atua apenas como cliente. Quando ele envia os dados brutos de um imóvel pelo celular, o backend web processa tudo com o auxílio da inteligência artificial (OpenAI), transformando informações cruas em publicações comerciais robustas sem que ele precise lidar com textos complexos.
+
+A escolha de manter o app em um repositório separado garante que os ciclos de release mobile não interfiram no uptime do site principal, além de manter a base de código do app pequena e focada.
 
 ## Tecnologias e Arquitetura
 
