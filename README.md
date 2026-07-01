@@ -6,6 +6,8 @@ Aplicativo móvel desenvolvido para auxiliar na gestão do dia a dia do corretor
 
 Este projeto é a interface mobile do ecossistema criado para o meu pai (corretor Marcílio Barbosa).
 
+> 🌐 **Plataforma Web / Backend:** Este aplicativo atua apenas como cliente e consome a API do portal imobiliário principal, onde fica toda a infraestrutura de banco de dados (PostgreSQL), armazenamento (MinIO) e integração com IA. Você pode conferir o código do backend e do site público aqui: [marciliobarbosa-corretor](https://github.com/KriawqZero/marciliobarbosa-corretor).
+
 Como ele é leigo em tecnologia, a área administrativa padrão de sistemas web ou CMSs convencionais costuma ser uma grande barreira no dia a dia. Por isso, desenvolvi este app nativo para ser instalado diretamente no seu celular. O foco exclusivo é a facilidade de uso: com apenas alguns toques e uma interface extremamente enxuta, ele consegue visualizar sua agenda, notificações e cadastrar novos imóveis de onde estiver.
 
 O aplicativo atua apenas como cliente. Quando ele envia os dados brutos de um imóvel pelo celular, o backend web processa tudo com o auxílio da inteligência artificial (OpenAI), transformando informações cruas em publicações comerciais robustas sem que ele precise lidar com textos complexos.
